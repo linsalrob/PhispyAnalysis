@@ -1,0 +1,10 @@
+jupyter
+matplotlib
+numpy
+pandas
+requests
+scikit-bio
+scipy
+seaborn
+sklearn
+statsmodels
