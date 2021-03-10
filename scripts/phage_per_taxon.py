@@ -8,7 +8,7 @@ import argparse
 from multiprocessing import Process, Queue
 import gzip
 import re
-from taxon import taxonomy_hierarchy_as_list, get_taxonomy_db
+from taxon import taxonomy_hierarchy_as_list, get_taxonomy_db, EntryNotInDatabaseError
 
 __author__ = 'Rob Edwards'
 
@@ -40,7 +40,10 @@ def get_taxonomy(gbkf, q):
 
 
     conn = get_taxonomy_db()
-    l = taxonomy_hierarchy_as_list(conn, tid)
+    try:
+        l = taxonomy_hierarchy_as_list(conn, tid)
+    except EntryNotInDatabaseError as e:
+        l = ['DELETED TAXONOMY']
     l.insert(0, tid)
     q.put(l)
 
