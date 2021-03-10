@@ -37,6 +37,8 @@ def get_taxonomy(gbkf, q):
 
     f.close()
 
+
+
     conn = get_taxonomy_db()
     l = taxonomy_hierarchy_as_list(conn, tid)
     l.insert(0, tid)
@@ -80,6 +82,6 @@ if __name__ == "__main__":
 
     taxonomy = gbkq.get()
     phagen = phageq.get()
-    print("\t".join(map(str, taxonomy + [phagen])))
+    print("\t".join(map(str, [args.g] + taxonomy + [phagen])))
     p.join()
     g.join()
