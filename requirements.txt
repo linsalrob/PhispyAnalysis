@@ -2,6 +2,7 @@ jupyter
 matplotlib
 numpy
 pandas
+phispy
 requests
 scikit-bio
 scipy
