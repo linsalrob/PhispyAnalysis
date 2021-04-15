@@ -1,11 +1,5 @@
-jupyter
-matplotlib
-numpy
-pandas
-phispy
-requests
-scikit-bio
-scipy
-seaborn
-sklearn
-statsmodels
+numpy~=1.20.1
+pandas~=1.2.3
+scipy~=1.6.1
+pytz~=2021.1
+python-dateutil~=2.8.1
