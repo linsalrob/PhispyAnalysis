@@ -11,7 +11,7 @@ import gzip
 import re
 
 
-def run(inputfile, verbose=False):
+def count_phage_proteins(inputfile, verbose=False):
     """
     Count some information
     :param inputfile: the input file
@@ -51,12 +51,12 @@ def run(inputfile, verbose=False):
                 phagecount += 1
             if ishypo:
                 unkfunc += 1
-            if isphage and ishypo:
+            if verbose and isphage and ishypo:
                 sys.stderr.write(f"ERROR: Both phage and hypothetical for |{p}|\n")
             if 'phmm' in feat.qualifiers:
                 phmms += 1
+        yield [seq.id, phagecount, phmms, unkfunc, featcount]
     handle.close()
-    return [phagecount, phmms, unkfunc, featcount]
 
 
 if __name__ == "__main__":
@@ -68,4 +68,8 @@ if __name__ == "__main__":
 
     if args.t:
         print("Phage proteins\tPVOG HMMS\tUnknown Proteins\tTotal Proteins")
-    print("\t".join(map(str, run(args.g, args.v))))
+    
+    for sid, phagecount, phmms, unkfunc, featcount in count_phage_proteins(args.g, args.v):
+        print(f"{sid}\t{phagecount}\t{phmms}\t{unkfunc}\t{featcount}")
+
+
