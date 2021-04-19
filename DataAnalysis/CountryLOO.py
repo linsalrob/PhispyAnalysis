@@ -5,7 +5,12 @@ Run a random forest leave one out analysis on a cluster
 import sys
 import pandas as pd
 import re
+
+from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, LeaveOneGroupOut
+import numpy as np
+
 from PhiSpyAnalysis import theils_u, DateConverter
 import subprocess
 
@@ -45,6 +50,18 @@ def loo():
     metadf['isolation_country'] = metadf['isolation_country'].replace('USA', 'United States')
     metadf['isolation_country'] = metadf['isolation_country'].replace('Ecully', 'France')
     metadf['geographic_location'] = metadf['geographic_location'].replace('USA', 'United States')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Adriatic Sea coasts', 'Adriatic Sea')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Côte', "Cote d'Ivoire")
+    metadf['isolation_country'] = metadf['isolation_country'].replace('" Azores"', 'Azores')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Democratic Republic of the Congo (Kinshasa)',
+                                                                      'Democratic Republic of the Congo')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Hong kong', 'Hong Kong')
+    metadf['isolation_country'] = metadf['isolation_country'].replace(' Republic of Korea', 'Republic of Korea')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Soviet Union', 'USSR')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Vietnam', 'Viet Nam')
+
+    # Finally replace all None with np.nan
+    metadf = metadf.fillna(value=np.nan)
 
     catdf = pd.read_csv("../data/categories.tsv.gz", compression='gzip', header=0, delimiter="\t")
     if 'gbff' in catdf:
@@ -66,22 +83,25 @@ def loo():
         pmenc[c] = phagemeta[c].astype('category').cat.codes
     pmenc['isolation_date'] = phagemeta['isolation_date'].fillna(-1)
 
+    x_train, x_test, y_train, y_test = train_test_split(pmenc['isolation_country'], phagemeta.Kept.values.ravel())
     clf = RandomForestClassifier(random_state=42, n_estimators=1000, bootstrap=True, n_jobs=-1, oob_score=True)
+    clf.fit(x_train.ravel().reshape(-1, 1), y_train)
+    y_pred = clf.predict(x_test.ravel().reshape(-1, 1))
+    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    f1base = metrics.f1_score(y_test, y_pred, average='weighted')
+    print(f"f1\t{f1base}")
 
-    # fit the initial data
-    initial_rf = clf.fit(pmenc, phagemeta.Kept.values.ravel())
-    init_importance = dict(zip(pmenc.columns, initial_rf.feature_importances_))
+    logo = LeaveOneGroupOut()
+    print("Leaving Out\tf1 delta")
 
-    print(f"Initial importance: {init_importance}")
+    for trainidx, testidx in logo.split(x_train, y_train, groups=x_train):
+        clf.fit(x_train.iloc[trainidx].ravel().reshape(-1, 1), y_train[trainidx])
+        new_pred = clf.predict(x_test.ravel().reshape(-1, 1))
+        f1measure = metrics.f1_score(y_test, new_pred, average='weighted')
+        print(f"{pd.unique(x_train.iloc[testidx].values)}\t{f1base - f1measure}")
 
-    print("Country Ommitted\tImportance\tImportance delta")
-    imps = {}
-    for c in pd.unique(phagemeta['isolation_country']):
-        changedc = phagemeta.replace(c, "None")
-        pmenc['isolation_country'] = changedc['isolation_country'].astype('category').cat.codes
-        rf = clf.fit(pmenc, phagemeta.Kept.values.ravel())
-        imps[c] = rf.feature_importances_[0]
-        print(f"{c}\t{imps[c]}\t{init_importance['isolation_country'] - imps[c]}")
+
+
 
 
 if __name__ == "__main__":
