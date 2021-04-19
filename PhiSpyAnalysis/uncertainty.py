@@ -9,6 +9,8 @@ but I have abstracted and simplified it here for my use
 
 import math
 from collections import Counter
+import sys
+
 
 from scipy.stats import entropy
 
@@ -50,6 +52,11 @@ def conditional_entropy(x, y, log_base: float = math.e):
     x = handle_na(x)
     y = handle_na(y)
 
+    # x and y should be the same shape
+    if x.shape != y.shape:
+        sys.stderr.write("ERROR: In conditional entropy the two dfs must have the same shape. Not {x.shape} and {y.shape}\n")
+        return 0
+
     y_counter = Counter(y)
     xy_counter = Counter(list(zip(x, y)))
     total_occurrences = sum(y_counter.values())
@@ -57,7 +64,7 @@ def conditional_entropy(x, y, log_base: float = math.e):
     for xy in xy_counter.keys():
         p_xy = xy_counter[xy] / total_occurrences
         p_y = y_counter[xy[1]] / total_occurrences
-        entrop += p_xy * math.log(p_y / p_xy, log_base)
+        entrop += -1 * p_xy * math.log(p_xy / p_y, log_base)
     return entrop
 
 
