@@ -11,5 +11,5 @@
 # How much memory. I usually request 2000M (2 GB) if I am not sure
 #SBATCH --mem=20000M
 
-python3 CountryLOO.py
+python3  LOGO.py --check_category
 
