@@ -83,8 +83,19 @@ def loo():
         pmenc[c] = phagemeta[c].astype('category').cat.codes
     pmenc['isolation_date'] = phagemeta['isolation_date'].fillna(-1)
 
+    # print a list of the countries and their IDs for the LOGO analysis.
+    seen=set()
+    print("\n***********************************\n")
+    print("Code\tCountry")
+    for index, row in phagemeta.iterrows():
+        if pmenc.loc[index, 'isolation_country'] not in seen:
+            print(f"{pmenc.loc[index, 'isolation_country']}\t{phagemeta.loc[index, 'isolation_country']}")
+            seen.add(pmenc.loc[index, 'isolation_country'])
+
+    print("\n***********************************\n")
+
     x_train, x_test, y_train, y_test = train_test_split(pmenc['isolation_country'], phagemeta.Kept.values.ravel())
-    clf = RandomForestClassifier(random_state=42, n_estimators=1000, bootstrap=True, n_jobs=-1, oob_score=True)
+    clf = RandomForestClassifier(random_state=42, n_estimators=1000, bootstrap=True, n_jobs=32, oob_score=True)
     clf.fit(x_train.ravel().reshape(-1, 1), y_train)
     y_pred = clf.predict(x_test.ravel().reshape(-1, 1))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
@@ -92,6 +103,7 @@ def loo():
     print(f"f1\t{f1base}")
 
     logo = LeaveOneGroupOut()
+    print("\n***********************************\n")
     print("Leaving Out\tf1 delta")
 
     for trainidx, testidx in logo.split(x_train, y_train, groups=x_train):
