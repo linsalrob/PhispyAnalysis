@@ -1,4 +1,4 @@
-Index	Contig	contig_id
+	Contig	contig_id
 2646	GCA_000159415.1_ASM15941v1_genomic.gbff.gz	GG693253.1_PP3
 6503	GCA_000305075.2_ASM30507v2_genomic.gbff.gz	JH967575.1_PP3
 6879	GCA_000304995.1_ASM30499v1_genomic.gbff.gz	JH967060.1_PP4
