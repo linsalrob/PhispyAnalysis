@@ -26,7 +26,7 @@ awk '!s[$1]++' checkv.tsv > tmp && mv -f tmp checkv.tsv
 awk '!s[$1]++' phage_protein_counts.tsv > tmp && mv -f tmp phage_protein_counts.tsv
 awk '!s[$1]++' phages_per_genome.tsv > tmp && mv -f tmp phages_per_genome.tsv
 
-echo -e "BASE\tProphage" > base_pp.tsv; gunzip -c vogs_hits_counts.txt.gz | perl -pe 's#^.*/##; s/_VOGS_phage.gbk.gz//; s/\t\d+$//' >> base_pp.tsv
+echo -e "BASE\tProphage" > base_pp.tsv; gunzip -c vogs_hits_counts.txt.gz | perl -pe 's#^/##; s#_VOGS_phage.gbk.gz##; s#\t\d+$##'  >> base_pp.tsv
 
 for FILE in checkv.tsv dnaA_locations.tsv genbank.besthits.tsv phage_lengths.tsv phage_protein_counts.tsv phages_per_genome.tsv processed_prophages.txt base_pp.tsv;
 do
