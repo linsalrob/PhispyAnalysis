@@ -116,14 +116,12 @@ def read_gtdb(tsv_file="../data/bac120_metadata_r95.tsv.gz", use_small_data=Fals
     gtdb = gtdb.rename(columns={'ncbi_genbank_assembly_accession': 'assembly_accession'})
     return gtdb
 
-
 def read_gbk_metadata(tsv_file="../data/assembly_summary.txt.gz", use_small_data=False):
     if use_small_data:
         sys.stderr.write("Warning: small doesn't do anything with gbk_metadata data\n")
     gbk = pd.read_csv(tsv_file, compression='gzip', header=1, delimiter="\t")
     gbk = gbk.rename(columns={'# assembly_accession': 'assembly_accession'})
     return gbk
-
 
 def read_categories(tsv_file="../data/categories.tsv.gz", use_small_data=False):
     if use_small_data:
@@ -145,3 +143,10 @@ def read_transposons(tsv_file="../data/transposon_counts.tsv.gz", use_small_data
         tsv_file="../small_data/transposon_counts.tsv.gz"
     tns = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t")
     return tns
+
+def read_logo(tsv_file="../data/country_importance_table.tsv.gz", use_small_data=False):
+    if use_small_data:
+        sys.stderr.write("Warning: small doesn't do anything with gbk_metadata data\n")
+    logo = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t")
+    return logo
+
