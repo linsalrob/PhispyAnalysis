@@ -85,6 +85,10 @@ class DateConverter:
         if pd.isna(x):
             return np.nan
 
+        # there are two entries (GCA_904848585.1 and GCA_904848645.1) where isolation date is 1000
+        if '1000' == x:
+            return np.nan
+
         # we need to fix this before trying to parse
         m = self.moyr.match(x)
         if m:
