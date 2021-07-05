@@ -12,6 +12,7 @@ import subprocess
 
 from .correct_entries import file_to_accession, file_to_name
 from .correct_dates import DateConverter
+from .gtdb_manipulations import split_taxonomy
 
 from .dtype_definitions import metadata_dtypes, gtdb_dtypes
 
@@ -34,7 +35,7 @@ def read_phages(tsv_file="../data/phages_per_genome.tsv.gz", maxcontigs=100, use
     ikg = phagesdf.shape[0]
 
     if maxcontigs > 0:
-        phagesdf = phagesdf[phagesdf['Contigs'] > maxcontigs]
+        phagesdf = phagesdf[phagesdf['Contigs'] < maxcontigs]
 
     phagesdf['Contig'] = phagesdf['Contig'].astype('str')
     phagesdf = phagesdf.dropna(subset=['Genome length', 'Kept'])
@@ -48,7 +49,7 @@ def read_phages(tsv_file="../data/phages_per_genome.tsv.gz", maxcontigs=100, use
 
     sys.stderr.write(f"Please note that this was run with git commit {githash} that has {ikg:,} ")
     sys.stderr.write(f"genomes parsed.\n")
-    sys.stderr.write(f"Initially there were {ikp:,.0f} kept phages,")
+    sys.stderr.write(f"Initially there were {ikp:,.0f} kept phages, ")
     sys.stderr.write(f"but after filtering we kept {phagesdf['Kept'].sum():,.0f} prophages ")
     sys.stderr.write(f"from {phagesdf.shape[0]:,} genomes")
 
@@ -108,12 +109,27 @@ def read_metadata(tsv_file="../data/patric_genome_metadata.tsv.gz", use_small_da
 
     return metadf
 
+"""
+### Split the taxonomy into separate columns
+
+We split on `_` but unfortunately the `_` means something specific in GTDB. This is taken from the [FAQ](https://gtdb.ecogenomic.org/faq)
+> If the organism had been assigned a binomial species name such as Prevotella oralitaxus str. F0040, and it is not part of true Prevotella in GTDB, we would assign it to the placeholder genus g__Prevotella_A to indicate it is not a true Prevotella species, but that there are representative genomes that have been assigned to a species
+
+We at least remove the `g__` at the beginning and then leave the appendages.
+"""
+
 def read_gtdb(tsv_file="../data/bac120_metadata_r95.tsv.gz", use_small_data=False):
     if use_small_data:
         sys.stderr.write("Warning: small doesn't do anything with GTDB data\n")
     #gtdb = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t", na_values='none')
     gtdb = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t", dtype=gtdb_dtypes(), na_values='none')
     gtdb = gtdb.rename(columns={'ncbi_genbank_assembly_accession': 'assembly_accession'})
+
+    # split the gtdb taxonomy into individual columns
+    tc = ['domain', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+    gtdb = pd.concat(
+        [gtdb, pd.DataFrame.from_records(gtdb['gtdb_taxonomy'].apply(split_taxonomy), columns=tc)],
+        axis=1)
     return gtdb
 
 def read_gbk_metadata(tsv_file="../data/assembly_summary.txt.gz", use_small_data=False):
@@ -149,4 +165,10 @@ def read_logo(tsv_file="../data/country_importance_table.tsv.gz", use_small_data
         sys.stderr.write("Warning: small doesn't do anything with gbk_metadata data\n")
     logo = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t")
     return logo
+
+def read_insertion_lengths(tsv_file="../data/insertion_lengths.tsv.gz", use_small_data=False):
+    if use_small_data:
+        sys.stderr.write("Warning: small doesn't do anything with gbk_metadata data\n")
+    insl = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t")
+    return insl
 
