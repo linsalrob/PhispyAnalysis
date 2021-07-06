@@ -65,10 +65,23 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=' ')
     parser.add_argument('-d', '--directory', help='directory of three column annotation files', required=True)
     parser.add_argument('-o', '--output', help='output file to write', required=True)
+    parser.add_argument('-e', '--existing', help='existing tsv output with genomes in columns and annotations in rows')
     parser.add_argument('-v', '--verbose', help='verbose output', action='store_true')
     args = parser.parse_args()
 
     allfns = set()
+    number_existing_genomes = 0
+    existing_data = {}
+    nzeros = ""
+    if args.existing:
+        with open(args.existing, 'r') as f:
+            for li in f:
+                p = li.strip().split("\t")
+                allfns.add(p[0])
+                existing_data[p[0]] = "\t".join(p[1:])
+                number_existing_genomes = len(p) - 1
+        nzeros = "\t".join(map(str, [0 for i in range(number_existing_genomes)]))
+
     allfiles = set()
     fn2file = {}
     for inf in os.listdir(args.directory):
@@ -78,11 +91,19 @@ if __name__ == "__main__":
         fn2file[inf] = fns
 
     sfns = sorted(allfns)
+    sfiles = sorted(allfiles)
+
     with open(args.output, 'w') as out:
-        out.write("\t".join(["file"] + sfns))
+        out.write("\t".join(["function"] + sfiles))
         out.write("\n")
-        for f in sorted(allfiles):
+        for f in sorted(sfns):
             out.write(f)
+            if args.existing:
+                if f in existing_data:
+                    out.write(f"\t{existing_data[f]}")
+                else:
+                    out.write(f"\t{nzeros}")
+
             for fn in sfns:
                 if fn in fn2file[f]:
                     out.write(f"\t{fn2file[f][fn]}")
