@@ -53,7 +53,7 @@ def read_file(inf, verbose=False):
         fin = open(inf, 'r')
     for li in fin:
         p = li.strip().split('\t')
-        f = convert_string(p[3])
+        f = convert_string(p[2])
         fn[f] = fn.get(f, 0) + 1
 
     fin.close()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     allfiles = set()
     fn2file = {}
     for inf in os.listdir(args.directory):
-        fns = read_file(inf, args.verbose)
+        fns = read_file(os.path.join(args.directory, inf), args.verbose)
         allfns.update(set(fns.keys()))
         allfiles.add(inf)
         fn2file[inf] = fns
