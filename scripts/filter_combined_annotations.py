@@ -35,7 +35,7 @@ if __name__ == "__main__":
         if args.v:
             sys.stderr.write(f"Parsing {filecount} {f}\n")
         with open(os.path.join(args.d, f), 'r') as fin, open(os.path.join(args.o, f), 'w') as out:
-            for l in f:
+            for l in fin:
                 if l.startswith('Function'):
                     out.write(l)
                     continue
