@@ -17,12 +17,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Filter annotations')
     parser.add_argument('-d', help='directory of annotations', required=True)
     parser.add_argument('-o', help='output directory of annotations', required=True)
-    parser.add_argument('-n', help='minimum number of entries', type=int, required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-n', help='minimum number of entries', type=int)
+    group.add_argument('-p', help='percent of the records that must be non zero', type=float)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
     os.makedirs(args.o, exist_ok=True)
     noan = re.compile('^.*?\t')
+
+    if args.p and args.p > 1:
+        args.p /= 100
 
     filecount = 0
     for f in os.listdir(args.d):
@@ -34,7 +39,11 @@ if __name__ == "__main__":
                 if l.startswith('Function'):
                     out.write(l)
                     continue
-                if len([x for x in map(int, noan.sub('', l).strip().split("\t")) if x > 0]) > args.n:
-                    out.write(l)
+                if args.n:
+                    if len([x for x in map(int, noan.sub('', l).strip().split("\t")) if x > 0]) > args.n:
+                        out.write(l)
+                else:
+                    if len([x for x in map(int, noan.sub('', l).strip().split("\t")) if x > 0])/l.count("\t") > args.p:
+                        out.write(l)
 
 
