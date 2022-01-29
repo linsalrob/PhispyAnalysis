@@ -31,6 +31,8 @@ def convert_string(x):
             s += c
         elif 65 <= ord(c) <= 90:
             s += chr(ord(c) + 32)
+    if s.startswith('conserved '):
+        s = s.replace('conserved ', '')
     return s
 
 
@@ -70,17 +72,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     allfns = set()
-    number_existing_genomes = 0
+    existing_genomes = []
     existing_data = {}
     nzeros = ""
     if args.existing:
+        firstline = True
         with open(args.existing, 'r') as f:
             for li in f:
                 p = li.strip().split("\t")
+                if firstline:
+                    existing_genomes = p[1:]
+                    firstline = False
+                    continue
                 allfns.add(p[0])
                 existing_data[p[0]] = "\t".join(p[1:])
-                number_existing_genomes = len(p) - 1
-        nzeros = "\t".join(map(str, [0 for i in range(number_existing_genomes)]))
+        nzeros = "\t".join(map(str, [0 for i in existing_genomes]))
 
     allfiles = set()
     fn2file = {}
@@ -94,19 +100,19 @@ if __name__ == "__main__":
     sfiles = sorted(allfiles)
 
     with open(args.output, 'w') as out:
-        out.write("\t".join(["function"] + sfiles))
+        out.write("\t".join(["Function"] + existing_genomes + sfiles))
         out.write("\n")
-        for f in sorted(sfns):
-            out.write(f)
-            if args.existing:
-                if f in existing_data:
-                    out.write(f"\t{existing_data[f]}")
+        for func in sorted(sfns):
+            out.write(func)
+            if existing_data:
+                if func in existing_data:
+                    out.write(f"\t{existing_data[func]}")
                 else:
                     out.write(f"\t{nzeros}")
 
-            for fn in sfns:
-                if fn in fn2file[f]:
-                    out.write(f"\t{fn2file[f][fn]}")
+            for fl in sfiles:
+                if func in fn2file[fl]:
+                    out.write(f"\t{fn2file[fl][func]}")
                 else:
                     out.write("\t0")
             out.write("\n")
