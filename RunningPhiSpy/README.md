@@ -80,7 +80,13 @@ qsub -cwd -q smallmem -o sge_out -e sge_err -V -t 1-$FILES:1 ./submit_phispy_vog
 ```
 
 For clusters that use SLURM:
+```bash
+rm -rf logs_slurm/ submit_phispy; mkdir logs_slurm/ submit_phispy
+sbatch --array=1-454%5 submit_phispy_vogs_download.slurm
+```
 
+
+# Step 3. Now we can run some analysis on this data.
 
 COUNT THE NUMBER OF CONTIGS IN EACH FILE:
 
