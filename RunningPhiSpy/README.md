@@ -100,4 +100,10 @@ COUNT THE NUMBER OF PROPHAGES IN EACH PREDICTION
 find phispy/ -name \*prophage_coordinates.tsv.gz -printf "%f\t" -exec zgrep -c ^ "{}" \;
 
 
+COUNT THE NUMBER OF DIFFERENT GENERA IN THE ASSEMBLY FILE
 
+This requires [taxonkit](https://bioinf.shenwei.me/taxonkit) that you can install with `bioconda`
+```bash
+taxonkit lineage taxonomy_ids.tsv | taxonkit reformat -f "{g}" -F  > genera.tsv
+perl -F"\t" -lane 'if (!$F[2]) {$F[2] = "Unknown"} print $F[2]' genera.tsv | sort  | uniq -c | perl -pe 's/^\s+(\d+)\s+(.*)/$2\t$1/' > genera_counts.tsv
+```
