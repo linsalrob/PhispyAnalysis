@@ -49,8 +49,8 @@ def loo(check_country, check_category):
     metadf = metadf.groupby('assembly_accession').first().reset_index()
 
     metadf['isolation_country'] = metadf['isolation_country'].replace('USA', 'United States')
-    metadf['isolation_country'] = metadf['isolation_country'].replace('Ecully', 'France')
     metadf['geographic_location'] = metadf['geographic_location'].replace('USA', 'United States')
+    metadf['isolation_country'] = metadf['isolation_country'].replace('Ecully', 'France')
     metadf['isolation_country'] = metadf['isolation_country'].replace('Adriatic Sea coasts', 'Adriatic Sea')
     metadf['isolation_country'] = metadf['isolation_country'].replace('Côte', "Cote d'Ivoire")
     metadf['isolation_country'] = metadf['isolation_country'].replace('" Azores"', 'Azores')

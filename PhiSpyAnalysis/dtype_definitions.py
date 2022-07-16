@@ -5,6 +5,18 @@ They are also ugly, so stored here!
 
 """
 
+def phages_per_genome_dtypes_objects():
+    return {'GENOMEID': 'str', 'Total_bp': 'Int64', 'Contigs': 'Int64', 'Contigs_Checked': 'Int64',
+            'Total_Predicted_Prophages': 'Int64', 'Kept': 'Int64', 'No_phage_genes': 'Int64',
+            'Not_enough_genes': 'Int64', 'bp_of_kept_prophages': 'Int64', 'bp_no_phage_genes': 'Int64',
+            'bp_not_enough_genes': 'Int64', 'Note': 'str'}
+
+def phages_per_genome_dtypes():
+    return {'GENOMEID': 'str', 'Total_bp': 'int', 'Contigs': 'int', 'Contigs_Checked': 'int',
+            'Total_Predicted_Prophages': 'int', 'Kept': 'int', 'No_phage_genes': 'int',
+            'Not_enough_genes': 'int', 'bp_of_kept_prophages': 'int', 'bp_no_phage_genes': 'int',
+            'bp_not_enough_genes': 'int', 'Note': 'str'}
+
 def metadata_dtypes():
     return {'genome_id': 'float64', 'genome_name': 'str', 'organism_name': 'str', 'taxon_id': 'Int64',
             'genome_status': 'str', 'strain': 'str', 'serovar': 'str', 'biovar': 'str', 'pathovar': 'str',
@@ -65,3 +77,7 @@ def gtdb_dtypes():
             'ssu_silva_blast_subject_id': 'str', 'ssu_silva_taxonomy': 'str',
             'total_gap_length': 'Int64', 'trna_aa_count': 'Int64', 'trna_count': 'Int64',
             'trna_selenocysteine_count': 'Int64'}
+
+def phage_loc_dtypes():
+        return {'GENOMEID':'str', 'Contig': 'str', 'Start': 'int', 'Stop': 'int', 'Length': 'int',
+                '# CDS': 'int', 'Decision': 'str'}
