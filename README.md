@@ -1,16 +1,21 @@
+[![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.sdsu.edu/research)
+[![DOI](https://www.zenodo.org/badge/60999054.svg)](https://www.zenodo.org/badge/latestdoi/60999054)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub language count](https://img.shields.io/github/languages/count/linsalrob/PhiSpy)
+
 # PhispyAnalysis
 
-Analysis of phispy data for the paper.
+This data contains the accessory data and analysis scripts for our analysis of prophages reported in `Unveiling Hidden Prophage Diversity` which is currently in preparation.
 
-Most  of the analysis is in the DataAnalysis directory at the moment.
+The prophage predictions are available from [Cloudstor](https://cloudstor.aarnet.edu.au/plus/s/DSTTqlxtEKwcXFC) and will be available from FigShare shortly.
 
 ## [data](data)
 
-The data directory contains data frames from a variety of sources. See the [README](data/) for more information
-on those sources.
+The data directory contains data frames from a variety of sources. See the [README](data/) for more information on those sources.
 
-#TODO
-- add references
-- add how-to
-- describe how-to make the data
-- more stuff
+# CITE THIS PAPER
+
+`Unveiling Hidden Prophage Diversity`
+McKerral-Fisher _et al.,_ Manuscript in preparation
+
+
