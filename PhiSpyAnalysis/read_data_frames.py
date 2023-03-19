@@ -7,7 +7,8 @@ This way, we know that all data frames are read the same way!
 import sys
 import pandas as pd
 import subprocess
-from .correct_entries import clean_metadata
+import functools
+from .correct_entries import clean_metadata, clean_decision
 
 from .gtdb_manipulations import split_taxonomy
 
@@ -92,7 +93,7 @@ def read_base_pp(tsv_file="../data/base_pp.tsv.gz", use_small_data=False):
     return base_pp
 
 
-def read_metadata(tsv_file="../data/patric_genome_metadata.tsv.gz", use_small_data=False):
+def read_patric_metadata(tsv_file="../data/patric_genome_metadata.tsv.gz", use_small_data=False):
     if use_small_data:
         tsv_file = "../small_data/patric_genome_metadata.tsv.gz"
 
@@ -107,6 +108,13 @@ def read_metadata(tsv_file="../data/patric_genome_metadata.tsv.gz", use_small_da
 
     return metadf
 
+
+def read_metadata(**kwargs):
+    """
+    Backawards compatible
+    """
+    sys.stderr.write("WARNING: DEPRECATED. Please use read_patric_metadata\n")
+    return read_patric_metadata(kwargs)
 
 """
 ### Split the taxonomy into separate columns
@@ -164,6 +172,9 @@ def read_phage_locations(tsv_file="../data/prophage_locations.tsv.gz", use_small
         tsv_file = '../small_data/prophage_locations.tsv.gz'
     phage_locations = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t", dtype=phage_loc_dtypes(),
                                   na_values='none')
+    phage_locations = clean_decision(phage_locations)
+    phage_locations.insert(loc=0, column='assembly_accession', value=phage_locations['GENOMEID'])
+
     return phage_locations
 
 
@@ -211,3 +222,33 @@ def read_insertion_lengths(tsv_file="../data/insertion_lengths.tsv.gz", use_smal
         sys.stderr.write("Warning: small doesn't do anything with gbk_metadata data\n")
     insl = pd.read_csv(tsv_file, compression='gzip', header=0, delimiter="\t")
     return insl
+
+def bigtable(gtdb_representatives=False, use_small_data=False):
+    """
+    Read all the dataframes and return a bigtable with everything.
+    """
+    phage = read_phages(use_small_data=use_small_data)
+    metadf = read_patric_metadata(use_small_data=use_small_data)
+    gtdb = read_gtdb(representatives=gtdb_representatives, use_small_data=use_small_data)
+    gbk = read_gbk_metadata(use_small_data=use_small_data)
+    return functools.reduce(lambda left, right: 
+                            pd.merge(left, right, 
+                                     on="assembly_accession", 
+                                     how="inner"),
+                            [phage, gtdb, metadf, gbk]
+                           )
+
+
+def biglocations(gtdb_representatives=False, use_small_data=False):
+    """
+    Read the locations and join with the gtdb data
+    """
+    gtdb = read_gtdb(representatives=gtdb_representatives, use_small_data=use_small_data)
+    metadf = read_patric_metadata(use_small_data=use_small_data)
+    pl = read_phage_locations(use_small_data=use_small_data)
+    return functools.reduce(lambda left, right:
+                            pd.merge(left, right,
+                                     on="assembly_accession",
+                                     how="inner"),
+                            [pl, metadf, gtdb]
+                           )

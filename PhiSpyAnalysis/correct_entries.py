@@ -61,3 +61,11 @@ def clean_metadata(metadf):
     metadf = metadf.fillna(value=np.nan)
 
     return metadf
+
+def clean_decision(df):
+    """
+    We currently have two different decision fields. Lets munge this to one
+    """
+    df['Decision'] = df['Decision'].replace('Dropped. Not enough genes', 'Dropped. Region too small (Not enough genes)')
+    
+    return df
